@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BMI Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #needle {
+      position: absolute;
+      left: 45px; /* keep it on the right side of the meter */
+      width: 24px;
+      transition: top 0.5s ease-in-out;
+    }
+  </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
 
@@ -58,52 +66,56 @@
         <div class="flex-1 bg-orange-500 text-white flex items-center justify-center text-xs">Obese</div>
         <div class="flex-1 bg-red-600 text-white flex items-center justify-center text-xs">Extremely Obese</div>
 
-        <!-- Needle image -->
+        <!-- Needle -->
         <img id="needle" 
-             src="https://pngfre.com/wp-content/uploads/1000074844-300x300.png" 
+             src="https://cdn-icons-png.flaticon.com/512/32/32195.png" 
              alt="needle"
-             class="absolute w-6"
-             style="top:0; right:-28px;">
+             style="top:0;">
       </div>
     </div>
   </div>
 
   <script>
     function calculateBMI() {
-      let gender = document.getElementById("gender").value;
-      let age = document.getElementById("age").value;
-      let weightKg = document.getElementById("weightKg").value;
-      let height = document.getElementById("height").value;
+      const gender = document.getElementById("gender").value.trim();
+      const age = parseInt(document.getElementById("age").value);
+      const weightKg = parseFloat(document.getElementById("weightKg").value);
+      const height = parseFloat(document.getElementById("height").value) / 100;
+      const resultBox = document.getElementById("result");
+      const needle = document.getElementById("needle");
 
-      if (weightKg === "" || height === "" || gender === "" || age === "") {
-        document.getElementById("result").innerHTML = "⚠️ Please enter all values.";
+      if (!gender || !age || !weightKg || !height) {
+        resultBox.innerHTML = "⚠️ Please enter all values.";
         return;
       }
 
-      height = height / 100; // convert cm to meters
-      let bmi = (weightKg / (height * height)).toFixed(2);
+      const bmi = (weightKg / (height * height)).toFixed(1);
 
-      let category = "";
-      if (bmi < 18.5) category = "Underweight";
-      else if (bmi >= 18.5 && bmi < 24.9) category = "Healthy";
-      else if (bmi >= 25 && bmi < 29.9) category = "Overweight";
-      else if (bmi >= 30 && bmi < 34.9) category = "Obese";
-      else category = "Extremely Obese";
+      let category = '';
+      if (bmi < 18.5) category = 'Underweight';
+      else if (bmi < 25) category = 'Healthy';
+      else if (bmi < 30) category = 'Overweight';
+      else if (bmi < 35) category = 'Obese';
+      else category = 'Extremely Obese';
 
-      // Show result
-      document.getElementById("result").innerHTML = 
-        `Gender: <span class="text-purple-600">${gender}</span><br>
-         Age: <span class="text-green-600">${age}</span> years<br>
-         Your BMI is <span class="text-blue-600">${bmi}</span> (${category})`;
+      resultBox.innerHTML = `
+        Gender: <span class="text-purple-600">${gender}</span><br>
+        Age: <span class="text-green-600">${age}</span> years<br>
+        Your BMI is <span class="text-blue-600">${bmi}</span> (${category})
+      `;
 
-      // Move needle proportional to BMI (max 40 -> full height)
-      let meterHeight = 320; 
-      let maxBMI = 40; 
-      let needlePos = Math.min(bmi, maxBMI) / maxBMI * meterHeight;
+      // Needle position based on BMI
+      const meterHeight = 320; // h-80
+      let offsetPx = 0;
 
-      document.getElementById("needle").style.top = needlePos + "px";
+      if (bmi < 18.5) offsetPx = 0;       // top of meter
+      else if (bmi < 25) offsetPx = 64;   // Healthy slightly above center
+      else if (bmi < 30) offsetPx = 128;
+      else if (bmi < 35) offsetPx = 192;
+      else offsetPx = 256;                 // bottom of meter
+
+      needle.style.top = `${offsetPx}px`;
     }
   </script>
-
 </body>
 </html>

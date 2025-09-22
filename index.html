@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMI Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-[420px]">
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">BMI Calculator</h2>
+
+    <!-- Gender -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium mb-1">Gender</label>
+      <select id="gender" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+
+    <!-- Age -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium mb-1">Age</label>
+      <input id="age" type="number" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500" placeholder="Enter age">
+    </div>
+
+    <!-- Weight (kg) -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium mb-1">Weight (kg)</label>
+      <input id="weightKg" type="number" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500" placeholder="Enter weight in kg">
+    </div>
+
+    <!-- Height -->
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium mb-1">Height (cm)</label>
+      <input id="height" type="number" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500" placeholder="Enter height">
+    </div>
+
+    <!-- Button -->
+    <button onclick="calculateBMI()" class="w-full bg-blue-500 text-white py-2 rounded-lg font-medium hover:bg-blue-600 transition">
+      Calculate
+    </button>
+
+    <!-- Result -->
+    <div id="result" class="mt-6 text-center text-lg font-semibold text-gray-800"></div>
+
+    <!-- BMI Meter -->
+    <div class="flex justify-center mt-8">
+      <div class="relative w-28 h-80 border rounded-lg overflow-hidden flex flex-col">
+
+        <!-- Color bands -->
+        <div class="flex-1 bg-yellow-400 flex items-center justify-center text-xs">Underweight</div>
+        <div class="flex-1 bg-green-600 text-white flex items-center justify-center text-xs">Healthy</div>
+        <div class="flex-1 bg-blue-600 text-white flex items-center justify-center text-xs">Overweight</div>
+        <div class="flex-1 bg-orange-500 text-white flex items-center justify-center text-xs">Obese</div>
+        <div class="flex-1 bg-red-600 text-white flex items-center justify-center text-xs">Extremely Obese</div>
+
+        <!-- Needle image -->
+        <img id="needle" 
+             src="https://pngfre.com/wp-content/uploads/1000074844-300x300.png" 
+             alt="needle"
+             class="absolute w-6"
+             style="top:0; right:-28px;">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calculateBMI() {
+      let gender = document.getElementById("gender").value;
+      let age = document.getElementById("age").value;
+      let weightKg = document.getElementById("weightKg").value;
+      let height = document.getElementById("height").value;
+
+      if (weightKg === "" || height === "" || gender === "" || age === "") {
+        document.getElementById("result").innerHTML = "⚠️ Please enter all values.";
+        return;
+      }
+
+      height = height / 100; // convert cm to meters
+      let bmi = (weightKg / (height * height)).toFixed(2);
+
+      let category = "";
+      if (bmi < 18.5) category = "Underweight";
+      else if (bmi >= 18.5 && bmi < 24.9) category = "Healthy";
+      else if (bmi >= 25 && bmi < 29.9) category = "Overweight";
+      else if (bmi >= 30 && bmi < 34.9) category = "Obese";
+      else category = "Extremely Obese";
+
+      // Show result
+      document.getElementById("result").innerHTML = 
+        `Gender: <span class="text-purple-600">${gender}</span><br>
+         Age: <span class="text-green-600">${age}</span> years<br>
+         Your BMI is <span class="text-blue-600">${bmi}</span> (${category})`;
+
+      // Move needle proportional to BMI (max 40 -> full height)
+      let meterHeight = 320; 
+      let maxBMI = 40; 
+      let needlePos = Math.min(bmi, maxBMI) / maxBMI * meterHeight;
+
+      document.getElementById("needle").style.top = needlePos + "px";
+    }
+  </script>
+
+</body>
+</html>
